@@ -106,6 +106,14 @@ class IterableWeakSet {
     this._nodes = createWeakMap();
   }
   add(value) {
+    const currentNode = this._nodes.get(value);
+    if (currentNode) {
+      if (currentNode.value.deref()) {
+        return;
+      }
+      this._deleteNode(currentNode);
+    }
+
     const node = { value: createWeakRef(value), next: null, prev: null };
     if (!this._head) {
       this._head = node;
