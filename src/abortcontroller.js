@@ -96,21 +96,16 @@ class IterableWeakSet {
   }
 
   clear() {
-    let node = this._head;
-    while (node) {
-      this._finalizationRegistry.unregister(node.value.deref());
-      node = node.next;
+    while (this._head) {
+      this._deleteNode(this._head);
     }
-    this._head = null;
-    this._tail = null;
-    this._nodes = createWeakMap();
   }
   add(value) {
     const currentNode = this._nodes.get(value);
     if (currentNode) {
       if (currentNode.value.deref()) {
         return;
-      }
+      } 
       this._deleteNode(currentNode);
     }
 
@@ -134,16 +129,26 @@ class IterableWeakSet {
   }
 
   _deleteNode(node) {
+    if (!node) return;
     this._nodes.delete(node);
     const value = node.value.deref();
     if (value) {
       this._finalizationRegistry.unregister(value);
     }
     if (node === this._head) {
-      node.next.prev = null;
+      if (node.next) {
+        node.next.prev = null;
+      } else {
+        this._tail = node.next;
+      }
+
       this._head = node.next;
     } else if (node === this._tail) {
-      node.prev.next = null;
+      if (node.prev) {
+        node.prev.next = null;
+      } else {
+        this._head = node.prev;
+      }
       this._tail = node.prev;
     } else {
       const prev = node.prev;
