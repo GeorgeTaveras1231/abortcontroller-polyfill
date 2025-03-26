@@ -7,7 +7,9 @@
     },
     "globals": {
       "AbortController": true,
-      "AbortSignal": true
+        "AbortSignal": true,
+        "WeakRef": true,
+        "FinalizationRegistry": true
     },
     "parserOptions": {
         "ecmaVersion": 2018,
